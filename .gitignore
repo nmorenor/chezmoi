@@ -1,0 +1,8 @@
+bin/dlv
+bin/goimports
+bin/gomodifytags
+bin/goplay
+bin/gopls
+bin/gotests
+bin/impl
+bin/staticcheck

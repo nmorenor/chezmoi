@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="7">
+ <tileset firstgid="1" name="Room_Builder_free_32x32" tilewidth="32" tileheight="32" tilecount="391" columns="17">
+  <image source="Room_Builder_free_32x32.png" width="544" height="736"/>
+ </tileset>
+ <tileset firstgid="392" name="Interiors_free_32x32" tilewidth="32" tileheight="32" tilecount="1424" columns="16">
+  <image source="Interiors_free_32x32.png" width="512" height="2848"/>
+ </tileset>
+ <layer id="2" name="floor" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxbysDAsJQIfIfKmBg7R+0dtXfU3lF7kXEyGl4GxejiuDAh83DhRDRMrL5RPIpH8cjFABokYso=
+  </data>
+ </layer>
+ <layer id="12" name="carpets" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztzckJACAQxdDBxl0acGnApVLTgzAg/Ac5x0x+EYNZokwl+H0rr0adhuN38lq06Th+RUREXl1Uvwbf
+  </data>
+ </layer>
+ <layer id="1" name="walls" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJyrZWBgqCUCz6cyJsZOWtjLzkAY6AGxARHqiAV6o/aO2jtqL1XsNWBGxTCALo4LowNc6k6zovI5gWodmBEYBpDF8GF0QKw+TiqGH7EAFM6j9o7aO1zsBYFnQHyfzhhkJwCVDk4r
+  </data>
+ </layer>
+ <layer id="11" name="walls2" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzTZGBgcCCANYBYkwh1xGKQeQYMhIEekeqIBXpUNGsUjIJRMApGwSgYBaMAFwAAsrEH3w==
+  </data>
+ </layer>
+ <layer id="5" name="muebles" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztlDsvg1EYx59q+xLWuoS1mJTdJXa3krCQtBWEkPTCwISPoAxWl6GrstlaicQHIAxMSAxMNDH5vXKk5+1VoxJN/JN/nnOe55znl/dyjojIk1M+FSceq7GpS8ZX2txhiDgNsWiySmSqypqrUWvmyS9k1HS9q94JYlLjPDB+1OYu+tVncBfpu5TRu0mtWSW/llG70PpdOyWn3sintJqbfq0ad4tx1MjeZypqE9nGOzZr/iYPqxTtwdzPwb3lGffhHeBDfFfgXZvyUfcrB4qsLcR9Zm9cPecJ8aVIryD1kHL4h9wEvCQ++wa3VB3BjOf5vv/6+3pU/2StXaTObq2d27LX6zL47tVGOn7p3iHiIY4TJxy596boPUOtGWYL7ubM92AXuasC3F3qDbAajXQ8VffFq2LNEufycE2taLUB9g5id4H1pmLU22C1G+kYU3uc2n01Sn7sF86DD5YfBxRzBIZX4wQYT+MOzrcHd+KuMpz1ILwQDiuuD4Y/B7cXVp9yfxm46/A28GYebphxBA/BGsYj2Fvmu81UEEaoQu+3CO9u2WH93ytBH3pLRIs=
+  </data>
+ </layer>
+ <layer id="10" name="muebles-acc" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBh54CbrQLtgYMEWCv1/j4mBoYQJwb/PhFstMjgywsN9FNAXNLEwMDSzUG6OHuVGEA1mUMG9owA3SCayrKInECWjXAwCppNgCtOKKhn2JgHtTAbiFArsNh2geiACGPeRTITFSFFLSAwA8nQNcg==
+  </data>
+ </layer>
+ <layer id="8" name="wall-union" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBg4cJJ1AC0fBaNgFAw5YDAAduoNgJ0Dae8oGAXDCQxkPgIAmKIBiQ==
+  </data>
+ </layer>
+ <objectgroup id="6" name="mesa1" class="rect">
+  <object id="1" x="102.542" y="139.927" width="114.292" height="48.0667"/>
+ </objectgroup>
+ <objectgroup id="9" name="wallRoom2">
+  <object id="6" x="511.643" y="330.058">
+   <polygon points="0,0 -189.062,0 -191.198,-328.99 -52.3392,-327.921 445.418,-328.99 446.486,-1.06815 127.11,-1.06815 127.11,-7.47703 434.736,-9.61333 433.668,-323.649 -178.381,-319.376 -179.449,-9.61333 0,-11.7496"/>
+  </object>
+ </objectgroup>
+ <objectgroup id="7" name="wallRoom1">
+  <object id="5" x="192.267" y="319.376">
+   <polygon points="0,0 -1.06815,9.61333 126.041,10.6815 126.041,-318.308 -193.335,-318.308 -192.267,10.6815 -63.0207,11.7496 -64.0889,0 -179.449,1.06815 -180.517,-309.763 115.36,-308.695 114.292,0"/>
+  </object>
+ </objectgroup>
+</map>
