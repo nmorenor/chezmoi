@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 
+	"github.com/ByteArena/box2d"
 	"github.com/chezmoi/assets"
 	"github.com/chezmoi/systems"
 
@@ -12,6 +13,8 @@ import (
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
 	"golang.org/x/image/font/gofont/gosmallcaps"
+
+	"github.com/Noofbiz/engoBox2dSystem"
 )
 
 type MainScene struct {
@@ -60,10 +63,14 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 		ZoomSpeed: -0.125,
 	})
 
+	world.AddSystem(&engoBox2dSystem.PhysicsSystem{VelocityIterations: 1, PositionIterations: 1})
+	world.AddSystem(&engoBox2dSystem.CollisionSystem{})
+
 	world.AddSystem(&systems.TilesSystem{})
-	world.AddSystem(&systems.SpeedSystem{})
 	world.AddSystem(&systems.ControlSystem{})
 	world.AddSystem(&systems.GuysSystem{})
+
+	engoBox2dSystem.World.SetGravity(box2d.B2Vec2{X: 0, Y: 0})
 
 	engo.Input.RegisterAxis(
 		"vertical",

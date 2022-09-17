@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo/common"
 )
 
@@ -11,7 +10,7 @@ type ControlComponent struct {
 }
 
 type ControlEntity struct {
-	*ecs.BasicEntity
+	*Guy
 	*common.AnimationComponent
 	*ControlComponent
 	*common.SpaceComponent

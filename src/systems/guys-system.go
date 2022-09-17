@@ -6,6 +6,9 @@ import (
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+
+	"github.com/ByteArena/box2d"
+	"github.com/Noofbiz/engoBox2dSystem"
 )
 
 type GuysSystem struct {
@@ -107,7 +110,6 @@ func (*GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *c
 		Scale:    engo.Point{X: 1, Y: 1},
 	}
 
-	hero.SpeedComponent = entities.SpeedComponent{}
 	hero.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
 	hero.AnimationComponent.AddAnimations(Actions)
@@ -119,6 +121,22 @@ func (*GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *c
 	}
 
 	hero.RenderComponent.SetZIndex(6)
+
+	dudeBodyDef := box2d.NewB2BodyDef()
+	dudeBodyDef.Type = box2d.B2BodyType.B2_dynamicBody
+	dudeBodyDef.Position = engoBox2dSystem.Conv.ToBox2d2Vec(point)
+	dudeBodyDef.Angle = engoBox2dSystem.Conv.DegToRad(hero.SpaceComponent.Rotation)
+	dudeBodyDef.FixedRotation = true
+	hero.Box2dComponent.Body = engoBox2dSystem.World.CreateBody(dudeBodyDef)
+	var dudeBodyShape box2d.B2PolygonShape
+	dudeBodyShape.SetAsBox(engoBox2dSystem.Conv.PxToMeters(hero.SpaceComponent.Height/3),
+		engoBox2dSystem.Conv.PxToMeters((hero.SpaceComponent.Height/2)-(hero.SpaceComponent.Height/3)))
+	dudeFixtureDef := box2d.B2FixtureDef{
+		Shape:    &dudeBodyShape,
+		Density:  1.0,
+		Friction: 0.1,
+	}
+	hero.Box2dComponent.Body.CreateFixtureFromDef(&dudeFixtureDef)
 
 	for _, system := range world.Systems() {
 		switch sys := system.(type) {
@@ -138,17 +156,22 @@ func (*GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *c
 
 		case *ControlSystem:
 			sys.Add(
-				&hero.BasicEntity,
+				hero,
 				&hero.AnimationComponent,
 				&hero.ControlComponent,
 				&hero.SpaceComponent,
 			)
-
-		case *SpeedSystem:
+		case *engoBox2dSystem.PhysicsSystem:
 			sys.Add(
 				&hero.BasicEntity,
-				&hero.SpeedComponent,
 				&hero.SpaceComponent,
+				&hero.Box2dComponent,
+			)
+		case *engoBox2dSystem.CollisionSystem:
+			sys.Add(
+				&hero.BasicEntity,
+				&hero.SpaceComponent,
+				&hero.Box2dComponent,
 			)
 		}
 	}
