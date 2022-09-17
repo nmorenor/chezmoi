@@ -161,9 +161,6 @@ func (c *ControlSystem) Update(dt float32) {
 			speed := dt * entities.SPEED_SCALE
 			vector, _ = vector.Normalize()
 			vector.MultiplyScalar(speed)
-			// fmt.Printf("%#v\n", vector)
-			// engo.Mailbox.Dispatch(entities.SpeedMessage{BasicEntity: &e.Guy.BasicEntity, Point: vector})
-			// speed = engo.GameWidth() * dt
 			e.Body.SetLinearVelocity(box2d.B2Vec2{X: float64(vector.X) * 30, Y: float64(vector.Y) * 30})
 		}
 	}

@@ -46,25 +46,25 @@
   <object id="7" type="furniture" x="224.289" y="10.3359" width="60.9819" height="68.2171"/>
   <object id="8" type="furniture" x="349.354" y="3.10078" width="53.4676" height="73.8669"/>
   <object id="9" type="furniture" x="478.553" y="105.224" width="47.5452" height="114.931"/>
-  <object id="10" type="furniture" x="673.902" y="127.132" width="29.9742" height="63.0491"/>
-  <object id="11" type="furniture" x="802.067" y="126.098" width="26.8734" height="65.1163"/>
+  <object id="10" type="furniture" x="673.902" y="109.694" width="29.9742" height="80.4873"/>
+  <object id="11" type="furniture" x="802.067" y="115.001" width="26.8734" height="76.2133"/>
   <object id="13" type="furniture" x="708.01" y="96.8851" width="84.7545" height="96.397"/>
   <object id="14" type="furniture" x="867.183" y="51.6796" width="27.907" height="32.4534"/>
   <object id="15" type="furniture" x="35.1421" y="54.7804" width="24.1847" height="30.9379"/>
-  <object id="20" type="wall" x="205.964" y="307.102" width="304.631" height="76.3596"/>
+  <object id="20" type="wall" x="205.964" y="300.761" width="304.631" height="82.7008"/>
   <object id="22" type="furniture" x="256.331" y="382.429" width="31.0078" height="11.1601"/>
   <object id="23" type="furniture" x="359.69" y="361.757" width="47.5452" height="35.9663"/>
   <object id="24" type="furniture" x="417.571" y="352.455" width="28.9406" height="51.4702"/>
-  <object id="25" type="wall" x="659.85" y="307" width="284.853" height="63.8169"/>
+  <object id="25" type="wall" x="659.85" y="300.659" width="284.853" height="70.1581"/>
   <object id="26" type="furniture" x="678.036" y="367.959" width="20.6718" height="15.2945"/>
   <object id="27" type="furniture" x="838.276" y="364.959" width="21.7054" height="17.9134"/>
   <object id="28" type="furniture" x="898.191" y="366.094" width="25.8398" height="21.7054"/>
-  <object id="29" type="furniture" x="881.654" y="456.575" width="41.3437" height="86.0606"/>
+  <object id="29" type="furniture" x="881.654" y="450.234" width="41.3437" height="92.4017"/>
   <object id="30" type="furniture" x="749.354" y="427.768" width="71.3178" height="83.8606"/>
   <object id="31" type="furniture" x="511.628" y="559.375" width="35.1421" height="35.973"/>
   <object id="32" type="furniutre" x="476.835" y="554.863" width="17.222" height="34.3179"/>
   <object id="33" type="furniutre" x="32.0413" y="581.64" width="32.0413" height="14.7428"/>
-  <object id="34" type="furniture" x="32.0413" y="451.819" width="34.381" height="87.7156"/>
+  <object id="34" type="furniture" x="32.0413" y="448.649" width="34.381" height="90.8862"/>
   <object id="35" type="furniture" x="124.031" y="435.93" width="73.385" height="88.1345"/>
   <object id="36" type="furniture" x="12.4031" y="387.597" width="37.2093" height="22.1175"/>
   <object id="48" x="705.453" y="334.496" width="122.067" height="52.3145"/>
@@ -81,8 +81,8 @@
  <objectgroup id="7" name="wallRoom1">
   <object id="16" type="wall" x="5.16796" y="8.26873" width="300.775" height="56.8475"/>
   <object id="17" type="wall" x="334.884" y="2.40946" width="608.786" height="51.6098"/>
-  <object id="18" type="wall" x="12.4031" y="307.515" width="113.695" height="73.8804"/>
-  <object id="37" type="wall" x="1.58529" y="600.824" width="954.344" height="39.6322"/>
+  <object id="18" type="wall" x="12.4031" y="301.173" width="113.695" height="80.2215"/>
+  <object id="37" type="wall" x="1.58529" y="594.483" width="954.344" height="45.9734"/>
   <object id="44" type="wall" x="-4.75587" y="60.241" width="11.097" height="264.743"/>
   <object id="45" type="wall" x="309.131" y="3.17058" width="17.4382" height="313.887"/>
   <object id="47" type="wall" x="946.417" y="3.17058" width="12.6823" height="323.399"/>
