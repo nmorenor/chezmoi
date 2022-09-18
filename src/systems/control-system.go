@@ -161,7 +161,8 @@ func (c *ControlSystem) Update(dt float32) {
 			speed := dt * entities.SPEED_SCALE
 			vector, _ = vector.Normalize()
 			vector.MultiplyScalar(speed)
-			e.Body.SetLinearVelocity(box2d.B2Vec2{X: float64(vector.X) * 30, Y: float64(vector.Y) * 30})
+
+			e.Body.SetLinearVelocity(box2d.B2Vec2{X: float64(vector.X) * float64(e.SpaceComponent.Width), Y: float64(vector.Y) * float64(e.SpaceComponent.Width)})
 		}
 	}
 }
