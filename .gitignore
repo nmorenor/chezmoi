@@ -6,3 +6,5 @@ bin/gopls
 bin/gotests
 bin/impl
 bin/staticcheck
+src/assets/fonts
+src/assets/textures/button.png

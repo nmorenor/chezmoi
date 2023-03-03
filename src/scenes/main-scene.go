@@ -6,8 +6,9 @@ import (
 	"image/color"
 
 	"github.com/ByteArena/box2d"
-	"github.com/chezmoi/assets"
-	"github.com/chezmoi/systems"
+	"github.com/nmorenor/chezmoi/assets"
+	"github.com/nmorenor/chezmoi/options"
+	"github.com/nmorenor/chezmoi/systems"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -20,7 +21,7 @@ import (
 type MainScene struct {
 }
 
-func (scene *MainScene) Type() string { return "myGame" }
+func (scene *MainScene) Type() string { return "Session" }
 
 // Preload is called before loading any assets from the disk,
 // to allow you to register / queue them
@@ -30,6 +31,7 @@ func (scene *MainScene) Preload() {
 		"levels/Room_Builder_free_32x32.png",
 		"levels/interiors.tmx",
 		"textures/run_horizontal_32x32_2.png",
+		"textures/button.png",
 	}
 	for _, file := range files {
 		data, err := assets.Asset(file)
@@ -59,16 +61,18 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 		400, engo.DefaultHorizontalAxis,
 		engo.DefaultVerticalAxis)
 	world.AddSystem(kbs)
-	world.AddSystem(&common.MouseZoomer{
-		ZoomSpeed: -0.125,
-	})
+	// world.AddSystem(&common.MouseZoomer{
+	// 	ZoomSpeed: -0.125,
+	// })
 
 	world.AddSystem(&engoBox2dSystem.PhysicsSystem{VelocityIterations: 1, PositionIterations: 1})
 	world.AddSystem(&engoBox2dSystem.CollisionSystem{})
 
 	world.AddSystem(&systems.TilesSystem{})
-	world.AddSystem(&systems.ControlSystem{})
+	world.AddSystem(systems.NewControlSystem(options.SessionInfo.Client))
 	world.AddSystem(&systems.GuysSystem{})
+	remoteSystem := systems.NewRemoteGuysSystem(options.SessionInfo.Client)
+	world.AddSystem(remoteSystem)
 
 	engoBox2dSystem.World.SetGravity(box2d.B2Vec2{X: 0, Y: 0})
 
@@ -83,21 +87,4 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 		engo.AxisKeyPair{Min: engo.KeyArrowLeft, Max: engo.KeyArrowRight},
 		engo.AxisKeyPair{Min: engo.KeyA, Max: engo.KeyD},
 	)
-}
-
-func (scene *MainScene) Start() {
-	opts := engo.RunOptions{
-		Title:          "Chez moi",
-		Width:          800,
-		Height:         600,
-		StandardInputs: true,
-	}
-	engo.Run(opts, scene)
-}
-
-var ChezMoiInstance = chezMoi()
-
-func chezMoi() *MainScene {
-	scene := &MainScene{}
-	return scene
 }

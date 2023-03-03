@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/chezmoi/entities"
+	"github.com/nmorenor/chezmoi/entities"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"

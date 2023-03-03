@@ -5,6 +5,7 @@ import (
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo/common"
+	"github.com/nmorenor/chezmoi/net"
 )
 
 const (
@@ -20,8 +21,12 @@ type Guy struct {
 	engoBox2dSystem.Box2dComponent
 	ControlComponent
 
-	Left  bool
-	Right bool
-	Up    bool
-	Down  bool
+	RemoteId        *string
+	RemoteVector    *net.Point
+	RemotePosition  *net.Point
+	RemoteAnimation *string
+	Left            bool
+	Right           bool
+	Up              bool
+	Down            bool
 }

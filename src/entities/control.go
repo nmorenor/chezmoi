@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo/common"
 )
 
@@ -14,4 +15,17 @@ type ControlEntity struct {
 	*common.AnimationComponent
 	*ControlComponent
 	*common.SpaceComponent
+}
+
+type Label struct {
+	ecs.BasicEntity
+	common.SpaceComponent
+	common.RenderComponent
+}
+
+type Button struct {
+	ecs.BasicEntity
+	common.SpaceComponent
+	common.RenderComponent
+	common.AudioComponent
 }

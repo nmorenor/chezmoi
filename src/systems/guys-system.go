@@ -1,7 +1,7 @@
 package systems
 
 import (
-	"github.com/chezmoi/entities"
+	"github.com/nmorenor/chezmoi/entities"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -82,6 +82,14 @@ func (cb *GuysSystem) New(world *ecs.World) {
 		WalkDownAction,
 		WalkLeftAction,
 		WalkRightAction,
+	}
+
+	ActionsByKey = make(map[string]*common.Animation)
+	for _, next := range Actions {
+		if next == nil {
+			continue
+		}
+		ActionsByKey[next.Name] = next
 	}
 
 	engo.Input.RegisterButton(UpButton, engo.KeyW, engo.KeyArrowUp)

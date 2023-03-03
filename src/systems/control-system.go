@@ -2,7 +2,8 @@ package systems
 
 import (
 	"github.com/ByteArena/box2d"
-	"github.com/chezmoi/entities"
+	"github.com/nmorenor/chezmoi/entities"
+	"github.com/nmorenor/chezmoi/net"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -20,6 +21,7 @@ var (
 	StopRightAction *common.Animation
 	SkillAction     *common.Animation
 	Actions         []*common.Animation
+	ActionsByKey    map[string]*common.Animation
 
 	UpButton    = "up"
 	DownButton  = "down"
@@ -30,6 +32,14 @@ var (
 
 type ControlSystem struct {
 	entities []entities.ControlEntity
+	client   *net.RemoteClient
+}
+
+func NewControlSystem(client *net.RemoteClient) *ControlSystem {
+	return &ControlSystem{
+		entities: make([]entities.ControlEntity, 0),
+		client:   client,
+	}
 }
 
 func (c *ControlSystem) Add(basic *entities.Guy, anim *common.AnimationComponent, control *entities.ControlComponent, space *common.SpaceComponent) {
@@ -49,62 +59,86 @@ func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
 	}
 }
 
-func setAnimation(e entities.ControlEntity) {
+func setAnimation(e entities.ControlEntity) *common.Animation {
+	var result *common.Animation
 	if engo.Input.Button(UpButton).JustPressed() {
 		e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
+		result = WalkUpAction
 	} else if engo.Input.Button(DownButton).JustPressed() {
 		e.AnimationComponent.SelectAnimationByAction(WalkDownAction)
+		result = WalkDownAction
 	} else if engo.Input.Button(LeftButton).JustPressed() {
 		e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
+		result = WalkLeftAction
 	} else if engo.Input.Button(RightButton).JustPressed() {
 		e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
-	}
-
-	if engo.Input.Button(UpButton).JustReleased() {
+		result = WalkRightAction
+	} else if engo.Input.Button(UpButton).JustReleased() {
 		e.AnimationComponent.SelectAnimationByAction(StopUpAction)
+		result = StopUpAction
 		if engo.Input.Button(LeftButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
+			result = WalkLeftAction
 		} else if engo.Input.Button(RightButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
+			result = WalkRightAction
 		} else if engo.Input.Button(UpButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
+			result = WalkUpAction
 		} else if engo.Input.Button(DownButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkDownAction)
+			result = WalkDownAction
 		}
 	} else if engo.Input.Button(DownButton).JustReleased() {
 		e.AnimationComponent.SelectAnimationByAction(StopDownAction)
+		result = StopDownAction
 		if engo.Input.Button(LeftButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
+			result = WalkLeftAction
 		} else if engo.Input.Button(RightButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
+			result = WalkRightAction
 		} else if engo.Input.Button(UpButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
+			result = WalkUpAction
 		} else if engo.Input.Button(DownButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkDownAction)
+			result = WalkDownAction
 		}
 	} else if engo.Input.Button(LeftButton).JustReleased() {
 		e.AnimationComponent.SelectAnimationByAction(StopLeftAction)
+		result = StopLeftAction
 		if engo.Input.Button(LeftButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
+			result = WalkLeftAction
 		} else if engo.Input.Button(RightButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
+			result = WalkRightAction
 		} else if engo.Input.Button(UpButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
+			result = WalkUpAction
 		} else if engo.Input.Button(DownButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkDownAction)
+			result = WalkDownAction
 		}
 	} else if engo.Input.Button(RightButton).JustReleased() {
 		e.AnimationComponent.SelectAnimationByAction(StopRightAction)
+		result = StopRightAction
 		if engo.Input.Button(LeftButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkLeftAction)
+			result = WalkLeftAction
 		} else if engo.Input.Button(RightButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkRightAction)
+			result = WalkRightAction
 		} else if engo.Input.Button(UpButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkUpAction)
+			result = WalkUpAction
 		} else if engo.Input.Button(DownButton).Down() {
 			e.AnimationComponent.SelectAnimationByAction(WalkDownAction)
+			result = WalkDownAction
 		}
 	}
+	return result
 }
 
 func getSpeed(e entities.ControlEntity) (p engo.Point, changed bool) {
@@ -155,14 +189,17 @@ func getSpeed(e entities.ControlEntity) (p engo.Point, changed bool) {
 
 func (c *ControlSystem) Update(dt float32) {
 	for _, e := range c.entities {
-		setAnimation(e)
+		anim := setAnimation(e)
 
 		if vector, changed := getSpeed(e); changed {
 			speed := dt * entities.SPEED_SCALE
 			vector, _ = vector.Normalize()
 			vector.MultiplyScalar(speed)
-
 			e.Body.SetLinearVelocity(box2d.B2Vec2{X: float64(vector.X) * float64(e.SpaceComponent.Width), Y: float64(vector.Y) * float64(e.SpaceComponent.Width)})
+			if anim != nil {
+				animName := anim.Name
+				go c.client.SendMessage(net.Point{X: vector.X, Y: vector.Y}, net.Point{X: e.SpaceComponent.Position.X, Y: e.SpaceComponent.Position.Y}, animName, c.client.Client.Id)
+			}
 		}
 	}
 }
