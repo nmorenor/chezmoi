@@ -37,9 +37,9 @@ func (t *TypingSystem) New(w *ecs.World) {
 
 	t.label = entities.Label{BasicEntity: ecs.NewBasic()}
 	if t.Session {
-		t.label.SpaceComponent.Position = engo.Point{X: (engo.GameWidth() / 2) - 150, Y: (engo.GameHeight() / 2) + 50}
+		t.label.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 150, Y: (engo.WindowHeight() / 2) + 50}
 	} else {
-		t.label.SpaceComponent.Position = engo.Point{X: (engo.GameWidth() / 2) - 70, Y: (engo.GameHeight() / 2) + 50}
+		t.label.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 70, Y: (engo.WindowHeight() / 2) + 50}
 	}
 	t.label.RenderComponent.Drawable = common.Text{
 		Font: fnt,
@@ -76,10 +76,13 @@ func (t *TypingSystem) StartSession() {
 	go func(c *client.Client) {
 		c.Connect()
 	}(remoteClient.Client)
-	engo.SetSceneByName("Session", true)
 }
 
 func (t *TypingSystem) Update(dt float32) {
+	if options.SessionInfo.Client != nil && options.SessionInfo.Client.Client.Id != nil {
+		engo.SetSceneByName("Session", true)
+		return
+	}
 	t.timeSinceDeletion += dt
 	str := ""
 	txt := t.label.Drawable.(common.Text)

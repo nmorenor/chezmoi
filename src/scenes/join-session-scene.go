@@ -65,7 +65,7 @@ func (scene *SetJoinSessionNameScene) Setup(updater engo.Updater) {
 		Text: "Session:",
 	}
 	t.RenderComponent.SetZIndex(1)
-	t.SpaceComponent.Position = engo.Point{X: (engo.GameWidth() / 2) - 70, Y: (engo.GameHeight() / 2) - 50}
+	t.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 70, Y: (engo.WindowHeight() / 2) - 50}
 	w.AddEntity(&t)
 
 	w.AddSystem(&systems.TypingSystem{Session: true})

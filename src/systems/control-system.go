@@ -201,5 +201,10 @@ func (c *ControlSystem) Update(dt float32) {
 				go c.client.SendMessage(net.Point{X: vector.X, Y: vector.Y}, net.Point{X: e.SpaceComponent.Position.X, Y: e.SpaceComponent.Position.Y}, animName, c.client.Client.Id)
 			}
 		}
+		var animname *string
+		if anim != nil {
+			animname = &anim.Name
+		}
+		c.client.SetLocalPosition(&e.SpaceComponent.Position, animname)
 	}
 }

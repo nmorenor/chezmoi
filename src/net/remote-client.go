@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/EngoEngine/engo"
 	"github.com/f1bonacc1/glippy"
 	"github.com/nmorenor/chezmoi-net/client"
 	"github.com/nmorenor/chezmoi-net/utils"
@@ -32,6 +33,15 @@ type Message struct {
 	Animation string
 }
 
+type PositionMessage struct {
+	Id string
+}
+
+type PositionResponseMessage struct {
+	Position Point
+	Anim     string
+}
+
 type RemoteClient struct {
 	Host           bool
 	initialized    bool
@@ -42,9 +52,12 @@ type RemoteClient struct {
 	queueMutex     *sync.Mutex
 	Username       string
 	Session        *string
+	LocalPosition  *engo.Point
+	LocalAnimation *string
 	OnRemoteUpdate func(client *RemoteClient, from *string, msg Message)
-	OnSessionJoin  func(client *RemoteClient, target *string)
+	OnSessionJoin  func(client *RemoteClient, target *string, position *Point, anim *string)
 	OnSessionLeave func(client *RemoteClient, target *string)
+	OnSessionEnd   func()
 }
 
 func (remoteClient *RemoteClient) target() *string {
@@ -86,11 +99,33 @@ func (remoteClient *RemoteClient) Initialize() {
 	if !remoteClient.Host {
 		for id := range remoteClient.participants {
 			if id != *remoteClient.Client.Id {
-				remoteClient.OnSessionJoin(remoteClient, &id)
+				remoteClient.mutex.Lock()
+				defer remoteClient.mutex.Unlock()
+				rpcClient := remoteClient.Client.GetRpcClientForService(*remoteClient)
+				sname := remoteClient.Client.GetServiceName(*remoteClient)
+				var position PositionResponseMessage
+				if rpcClient != nil {
+					remoteClient.queueMutex.Lock()
+					remoteClient.outUueue.Add(&id)
+					remoteClient.queueMutex.Unlock()
+					msg := PositionMessage{Id: id}
+					rpcClient.Call(sname+".GetPosition", msg, &position)
+				}
+				remoteClient.OnSessionJoin(remoteClient, &id, &position.Position, &position.Anim)
+
 			}
 		}
 	}
 	remoteClient.initialized = true
+}
+
+func (remoteClient *RemoteClient) SetLocalPosition(position *engo.Point, anim *string) {
+	remoteClient.mutex.Lock()
+	defer remoteClient.mutex.Unlock()
+	remoteClient.LocalPosition = position
+	if anim != nil {
+		remoteClient.LocalAnimation = anim
+	}
 }
 
 func (remoteClient *RemoteClient) SendMessage(vector Point, position Point, animation string, target *string) {
@@ -153,6 +188,15 @@ func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) err
 	return nil
 }
 
+func (remoteClient *RemoteClient) GetPosition(message *PositionMessage, reply *PositionResponseMessage) error {
+	remoteClient.mutex.Lock()
+	defer remoteClient.mutex.Unlock()
+	if remoteClient.LocalPosition != nil && remoteClient.LocalAnimation != nil {
+		*reply = PositionResponseMessage{Position: Point{X: remoteClient.LocalPosition.X, Y: remoteClient.LocalPosition.Y}, Anim: *remoteClient.LocalAnimation}
+	}
+	return nil
+}
+
 func (remoteClient *RemoteClient) onSessionChange(event client.SessionChangeEvent) {
 	remoteClient.mutex.Lock()
 	defer remoteClient.mutex.Unlock()
@@ -161,12 +205,17 @@ func (remoteClient *RemoteClient) onSessionChange(event client.SessionChangeEven
 	remoteClient.participants = response.Members
 	if event.EventType == client.SESSION_JOIN && remoteClient.participants[event.EventSource] != nil {
 		if remoteClient.OnSessionJoin != nil {
-			remoteClient.OnSessionJoin(remoteClient, &event.EventSource)
+			remoteClient.OnSessionJoin(remoteClient, &event.EventSource, nil, nil)
 		}
 	}
 	if event.EventType == client.SESSION_LEAVE && oldParticipants[event.EventSource] != nil {
 		if remoteClient.OnSessionLeave != nil {
 			remoteClient.OnSessionLeave(remoteClient, &event.EventSource)
+		}
+	}
+	if event.EventType == client.SESSION_END {
+		if remoteClient.OnSessionEnd != nil {
+			remoteClient.OnSessionEnd()
 		}
 	}
 }

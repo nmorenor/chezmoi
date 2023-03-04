@@ -5,6 +5,7 @@ import (
 
 	"github.com/nmorenor/chezmoi/entities"
 	"github.com/nmorenor/chezmoi/net"
+	"github.com/nmorenor/chezmoi/options"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -33,7 +34,12 @@ func NewRemoteGuysSystem(client *net.RemoteClient) *RemoteGuysSystem {
 	client.OnRemoteUpdate = system.onRemoteUpdate
 	client.OnSessionJoin = system.onSessionJoin
 	client.OnSessionLeave = system.onSessionLeave
+	client.OnSessionEnd = system.onSessionEnd
 	return system
+}
+
+func (system *RemoteGuysSystem) onSessionEnd() {
+	options.Reset()
 }
 
 func (system *RemoteGuysSystem) onRemoteUpdate(client *net.RemoteClient, from *string, msg net.Message) {
@@ -48,10 +54,22 @@ func (system *RemoteGuysSystem) onRemoteUpdate(client *net.RemoteClient, from *s
 	}
 }
 
-func (system *RemoteGuysSystem) onSessionJoin(client *net.RemoteClient, target *string) {
+func (system *RemoteGuysSystem) onSessionJoin(client *net.RemoteClient, target *string, targetPosition *net.Point, anim *string) {
 	system.mutex.Lock()
 	defer system.mutex.Unlock()
-	hero := system.CreateHero(system.world, engo.Point{X: engo.GameWidth() / 2, Y: (engo.GameHeight() / 2) + 128}, system.spriteSheet, *target)
+	var position engo.Point
+	if targetPosition != nil && targetPosition.X != 0 && targetPosition.Y != 0 {
+		position = engo.Point{X: targetPosition.X, Y: targetPosition.Y}
+	} else {
+		position = engo.Point{X: engo.GameWidth() / 2, Y: (engo.GameHeight() / 2) + 128}
+	}
+	hero := system.CreateHero(system.world, position, system.spriteSheet, *target)
+	if anim != nil {
+		targetAnim := ActionsByKey[*anim]
+		if targetAnim != nil {
+			hero.AnimationComponent.SelectAnimationByAction(targetAnim)
+		}
+	}
 	system.Add(
 		hero,
 		&hero.AnimationComponent,
@@ -69,6 +87,20 @@ func (system *RemoteGuysSystem) onSessionLeave(client *net.RemoteClient, target 
 	for _, e := range system.entities {
 		if e.Guy.RemoteId != nil && *e.Guy.RemoteId == *target {
 			system.Remove(e.BasicEntity)
+			for _, system := range system.world.Systems() {
+				switch sys := system.(type) {
+				case *common.RenderSystem:
+					sys.Remove(e.BasicEntity)
+				case *common.AnimationSystem:
+					sys.Remove(e.BasicEntity)
+				case *RemoteGuysSystem:
+					sys.Remove(e.BasicEntity)
+				case *engoBox2dSystem.PhysicsSystem:
+					sys.Remove(e.BasicEntity)
+				case *engoBox2dSystem.CollisionSystem:
+					sys.Remove(e.BasicEntity)
+				}
+			}
 		}
 	}
 }
@@ -91,6 +123,12 @@ func (system *RemoteGuysSystem) Remove(basic ecs.BasicEntity) {
 func (system *RemoteGuysSystem) Update(dt float32) {
 	system.mutex.Lock()
 	defer system.mutex.Unlock()
+
+	if options.SessionInfo.Client == nil {
+		engo.SetSceneByName("Start", true)
+		return
+	}
+
 	for _, e := range system.entities {
 		if e.Guy != nil && e.Guy.RemoteId != nil {
 			targetVector := e.Guy.RemoteVector

@@ -12,3 +12,7 @@ type SessionOptions struct {
 var (
 	SessionInfo = &SessionOptions{Username: nil, HostMode: false, Session: nil, Client: nil}
 )
+
+func Reset() {
+	SessionInfo = &SessionOptions{Username: nil, HostMode: false, Session: nil, Client: nil}
+}

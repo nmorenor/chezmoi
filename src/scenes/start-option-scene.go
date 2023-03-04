@@ -63,7 +63,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 		Text: "Start",
 	}
 	startLabel.RenderComponent.SetZIndex(1)
-	startLabel.SpaceComponent.Position = engo.Point{X: (engo.GameWidth() / 2) - 50, Y: (engo.GameHeight() / 2) - 50}
+	startLabel.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 50, Y: (engo.WindowHeight() / 2) - 50}
 	w.AddEntity(&startLabel)
 
 	hostSessionSystem := &systems.SetupSessionSystem{NextScene: "Username", HostMode: true}
@@ -73,7 +73,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 	hostButton := entities.Button{BasicEntity: ecs.NewBasic()}
 	hostButton.RenderComponent.Drawable = sgs
 	hostButton.RenderComponent.SetZIndex(2)
-	hostButton.SpaceComponent.Position = engo.Point{X: (engo.GameWidth() / 2) - 50, Y: (engo.GameHeight() / 2) + 50}
+	hostButton.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 50, Y: (engo.WindowHeight() / 2) + 50}
 	hostButton.SpaceComponent.Width = hostButton.RenderComponent.Drawable.Width()
 	hostButton.SpaceComponent.Height = hostButton.RenderComponent.Drawable.Height()
 

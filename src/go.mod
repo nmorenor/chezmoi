@@ -7,8 +7,9 @@ require (
 	github.com/EngoEngine/ecs v1.0.5
 	github.com/EngoEngine/engo v1.0.8
 	github.com/Noofbiz/engoBox2dSystem v0.0.0-20190406052309-cb6c1e5f27a0
+	github.com/f1bonacc1/glippy v0.0.0-20230203184233-82c6562cecd1
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
-	github.com/nmorenor/chezmoi-net v0.0.0-20230228031219-35e6ed326f28
+	github.com/nmorenor/chezmoi-net v0.0.0-20230304183102-e486d99f2e89
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	golang.org/x/image v0.5.0
 )
@@ -18,7 +19,6 @@ require (
 	github.com/EngoEngine/math v1.0.4 // indirect
 	github.com/Noofbiz/sdlMojaveFix v0.0.1 // indirect
 	github.com/Noofbiz/tmx v0.2.0 // indirect
-	github.com/f1bonacc1/glippy v0.0.0-20230203184233-82c6562cecd1 // indirect
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
