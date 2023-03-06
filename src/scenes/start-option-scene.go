@@ -45,7 +45,7 @@ func (scene *StartOptionsScene) Preload() {
 // to add entities and systems to your Scene.
 func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 	common.SetBackground(color.Black)
-
+	common.CameraBounds = engo.AABB{}
 	w, _ := updater.(*ecs.World)
 	var renderable *common.Renderable
 	var notrenderable *common.NotRenderable
@@ -63,7 +63,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 		Text: "Start",
 	}
 	startLabel.RenderComponent.SetZIndex(1)
-	startLabel.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 50, Y: (engo.WindowHeight() / 2) - 50}
+	startLabel.SpaceComponent.Position = engo.Point{X: 50, Y: 50}
 	w.AddEntity(&startLabel)
 
 	hostSessionSystem := &systems.SetupSessionSystem{NextScene: "Username", HostMode: true}
