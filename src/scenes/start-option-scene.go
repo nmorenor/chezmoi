@@ -63,7 +63,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 		Text: "Start",
 	}
 	startLabel.RenderComponent.SetZIndex(1)
-	startLabel.SpaceComponent.Position = engo.Point{X: 50, Y: 50}
+	startLabel.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 50, Y: (engo.WindowHeight() / 2) - 50}
 	w.AddEntity(&startLabel)
 
 	hostSessionSystem := &systems.SetupSessionSystem{NextScene: "Username", HostMode: true}

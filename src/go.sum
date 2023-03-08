@@ -52,6 +52,8 @@ github.com/nmorenor/chezmoi-net v0.0.0-20230304175959-f9bf1fd47b44 h1:K8h7y6Wk7q
 github.com/nmorenor/chezmoi-net v0.0.0-20230304175959-f9bf1fd47b44/go.mod h1:sQDDT9QIF8Nx9gU6U8gmVcy22XdkRm2EnWDtqNAxJ+4=
 github.com/nmorenor/chezmoi-net v0.0.0-20230304183102-e486d99f2e89 h1:a/4oY80/wUFM8rMIqyr/qH83N4hK+ktXaKV7dRVWvq8=
 github.com/nmorenor/chezmoi-net v0.0.0-20230304183102-e486d99f2e89/go.mod h1:sQDDT9QIF8Nx9gU6U8gmVcy22XdkRm2EnWDtqNAxJ+4=
+github.com/nmorenor/chezmoi-net v0.0.0-20230308152859-a2036aff8b5f h1:+vpTVaJVF+Ps7KQ/Zsurh4mGvis5H+6xPBC717A8UeE=
+github.com/nmorenor/chezmoi-net v0.0.0-20230308152859-a2036aff8b5f/go.mod h1:sQDDT9QIF8Nx9gU6U8gmVcy22XdkRm2EnWDtqNAxJ+4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=

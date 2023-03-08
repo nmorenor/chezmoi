@@ -112,7 +112,7 @@ func (remoteClient *RemoteClient) Initialize() {
 					rpcClient.Call(sname+".GetPosition", msg, &position)
 				}
 				remoteClient.OnSessionJoin(remoteClient, &id, &position.Position, &position.Anim)
-
+				break
 			}
 		}
 	}
@@ -178,7 +178,6 @@ func (remoteClient *RemoteClient) findParticipantFromName(target string) *string
 func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) error {
 	remoteClient.mutex.Lock()
 	defer remoteClient.mutex.Unlock()
-
 	if remoteClient.participants[message.Source] != nil {
 		if remoteClient.OnRemoteUpdate != nil {
 			remoteClient.OnRemoteUpdate(remoteClient, &message.Source, *message)
