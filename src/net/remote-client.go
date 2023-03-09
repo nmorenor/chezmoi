@@ -15,7 +15,7 @@ const (
 )
 
 func NewRemoteClient(currentClient *client.Client, userName string, hostMode bool) *RemoteClient {
-	remoteClient := &RemoteClient{Client: currentClient, participants: make(map[string]*string), mutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
+	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, mutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
 	remoteClient.Client.OnConnect = remoteClient.onReady
 	remoteClient.Client.OnSessionChange = remoteClient.onSessionChange
 	return remoteClient
@@ -46,7 +46,7 @@ type RemoteClient struct {
 	Host           bool
 	initialized    bool
 	Client         *client.Client
-	participants   map[string]*string
+	Participants   map[string]*string
 	outUueue       *utils.Queue[string]
 	mutex          *sync.Mutex
 	queueMutex     *sync.Mutex
@@ -88,7 +88,7 @@ func (remoteClient *RemoteClient) onReady() {
 	}
 
 	response := remoteClient.Client.SessionMembers()
-	remoteClient.participants = response.Members
+	remoteClient.Participants = response.Members
 
 }
 
@@ -97,7 +97,7 @@ func (remoteClient *RemoteClient) Initialize() {
 		return
 	}
 	if !remoteClient.Host {
-		for id := range remoteClient.participants {
+		for id := range remoteClient.Participants {
 			if id != *remoteClient.Client.Id {
 				remoteClient.mutex.Lock()
 				defer remoteClient.mutex.Unlock()
@@ -164,7 +164,7 @@ func ptr[T any](t T) *T {
 }
 
 func (remoteClient *RemoteClient) findParticipantFromName(target string) *string {
-	for id, name := range remoteClient.participants {
+	for id, name := range remoteClient.Participants {
 		if *name == target {
 			return &id
 		}
@@ -178,7 +178,7 @@ func (remoteClient *RemoteClient) findParticipantFromName(target string) *string
 func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) error {
 	remoteClient.mutex.Lock()
 	defer remoteClient.mutex.Unlock()
-	if remoteClient.participants[message.Source] != nil {
+	if remoteClient.Participants[message.Source] != nil {
 		if remoteClient.OnRemoteUpdate != nil {
 			remoteClient.OnRemoteUpdate(remoteClient, &message.Source, *message)
 		}
@@ -200,9 +200,9 @@ func (remoteClient *RemoteClient) onSessionChange(event client.SessionChangeEven
 	remoteClient.mutex.Lock()
 	defer remoteClient.mutex.Unlock()
 	response := remoteClient.Client.SessionMembers()
-	oldParticipants := remoteClient.participants
-	remoteClient.participants = response.Members
-	if event.EventType == client.SESSION_JOIN && remoteClient.participants[event.EventSource] != nil {
+	oldParticipants := remoteClient.Participants
+	remoteClient.Participants = response.Members
+	if event.EventType == client.SESSION_JOIN && remoteClient.Participants[event.EventSource] != nil {
 		if remoteClient.OnSessionJoin != nil {
 			remoteClient.OnSessionJoin(remoteClient, &event.EventSource, nil, nil)
 		}

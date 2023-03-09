@@ -67,7 +67,7 @@ func (t *TypingSystem) New(w *ecs.World) {
 func (*TypingSystem) Remove(ecs.BasicEntity) {}
 
 func (t *TypingSystem) StartSession() {
-	remoteClient := net.NewRemoteClient(client.NewClient(gowebsocket.New("ws://localhost:8080/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
+	remoteClient := net.NewRemoteClient(client.NewClient(gowebsocket.New("wss://nmorenor.com/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
 	if t.Session {
 		remoteClient.Session = options.SessionInfo.Session
 		remoteClient.Client.Session = options.SessionInfo.Session
@@ -79,7 +79,7 @@ func (t *TypingSystem) StartSession() {
 }
 
 func (t *TypingSystem) Update(dt float32) {
-	if options.SessionInfo.Client != nil && options.SessionInfo.Client.Client.Id != nil {
+	if options.SessionInfo.Client != nil && options.SessionInfo.Client.Client.Id != nil && options.SessionInfo.Client.Participants != nil {
 		engo.SetSceneByName("Session", true)
 		return
 	}

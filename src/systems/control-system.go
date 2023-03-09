@@ -205,6 +205,6 @@ func (c *ControlSystem) Update(dt float32) {
 		if anim != nil {
 			animname = &anim.Name
 		}
-		c.client.SetLocalPosition(&e.SpaceComponent.Position, animname)
+		go c.client.SetLocalPosition(&e.SpaceComponent.Position, animname)
 	}
 }
