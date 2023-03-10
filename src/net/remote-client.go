@@ -15,7 +15,7 @@ const (
 )
 
 func NewRemoteClient(currentClient *client.Client, userName string, hostMode bool) *RemoteClient {
-	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, mutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, locationMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
+	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, outmutex: &sync.Mutex{}, inmutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, locationMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
 	remoteClient.Client.OnConnect = remoteClient.onReady
 	remoteClient.Client.OnSessionChange = remoteClient.onSessionChange
 	return remoteClient
@@ -48,7 +48,8 @@ type RemoteClient struct {
 	Client         *client.Client
 	Participants   map[string]*string
 	outUueue       *utils.Queue[string]
-	mutex          *sync.Mutex
+	outmutex       *sync.Mutex
+	inmutex        *sync.Mutex
 	locationMutex  *sync.Mutex
 	queueMutex     *sync.Mutex
 	Username       string
@@ -100,8 +101,8 @@ func (remoteClient *RemoteClient) Initialize() {
 	if !remoteClient.Host {
 		for id := range remoteClient.Participants {
 			if id != *remoteClient.Client.Id {
-				remoteClient.mutex.Lock()
-				defer remoteClient.mutex.Unlock()
+				remoteClient.outmutex.Lock()
+				defer remoteClient.outmutex.Unlock()
 				rpcClient := remoteClient.Client.GetRpcClientForService(*remoteClient)
 				sname := remoteClient.Client.GetServiceName(*remoteClient)
 				var position PositionResponseMessage
@@ -130,8 +131,8 @@ func (remoteClient *RemoteClient) SetLocalPosition(position *engo.Point, anim *s
 }
 
 func (remoteClient *RemoteClient) SendMessage(vector Point, position Point, animation string, target *string) {
-	remoteClient.mutex.Lock()
-	defer remoteClient.mutex.Unlock()
+	remoteClient.outmutex.Lock()
+	defer remoteClient.outmutex.Unlock()
 	rpcClient := remoteClient.Client.GetRpcClientForService(*remoteClient)
 	sname := remoteClient.Client.GetServiceName(*remoteClient)
 	msg := &Message{
@@ -177,11 +178,10 @@ func (remoteClient *RemoteClient) findParticipantFromName(target string) *string
  * Message received from rcp call, RPC methods must follow the signature
  */
 func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) error {
-	remoteClient.mutex.Lock()
-	defer remoteClient.mutex.Unlock()
+	remoteClient.inmutex.Lock()
+	defer remoteClient.inmutex.Unlock()
 	if remoteClient.Participants[message.Source] != nil {
 		if remoteClient.OnRemoteUpdate != nil {
-			fmt.Println("hola")
 			remoteClient.OnRemoteUpdate(remoteClient, &message.Source, *message)
 		}
 	}
@@ -199,8 +199,8 @@ func (remoteClient *RemoteClient) GetPosition(message *PositionMessage, reply *P
 }
 
 func (remoteClient *RemoteClient) onSessionChange(event client.SessionChangeEvent) {
-	remoteClient.mutex.Lock()
-	defer remoteClient.mutex.Unlock()
+	remoteClient.inmutex.Lock()
+	defer remoteClient.inmutex.Unlock()
 	response := remoteClient.Client.SessionMembers()
 	oldParticipants := remoteClient.Participants
 	remoteClient.Participants = response.Members
