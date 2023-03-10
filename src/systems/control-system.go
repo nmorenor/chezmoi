@@ -205,6 +205,9 @@ func (c *ControlSystem) Update(dt float32) {
 		if anim != nil {
 			animname = &anim.Name
 		}
+		mid := e.SpaceComponent.Position.X + (e.SpaceComponent.Width / 2) - 4
+		target := mid - (e.Label.RenderComponent.Drawable.Width() / 2)
+		e.Label.SpaceComponent.Position = engo.Point{X: target, Y: e.SpaceComponent.Position.Y}
 		go c.client.SetLocalPosition(&e.SpaceComponent.Position, animname)
 	}
 }

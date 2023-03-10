@@ -25,6 +25,8 @@ type Guy struct {
 	RemoteVector    *net.Point
 	RemotePosition  *net.Point
 	RemoteAnimation *string
+	Name            *string
+	Label           *Label
 	Left            bool
 	Right           bool
 	Up              bool

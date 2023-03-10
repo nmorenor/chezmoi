@@ -17,15 +17,17 @@ import (
 
 type RemoteGuysSystem struct {
 	entities    []*entities.ControlEntity
+	labelFont   *common.Font
 	world       *ecs.World
 	spriteSheet *common.Spritesheet
 	client      *net.RemoteClient
 	mutex       *sync.Mutex
 }
 
-func NewRemoteGuysSystem(client *net.RemoteClient) *RemoteGuysSystem {
+func NewRemoteGuysSystem(client *net.RemoteClient, labelFont *common.Font) *RemoteGuysSystem {
 	system := &RemoteGuysSystem{
 		entities:    []*entities.ControlEntity{},
+		labelFont:   labelFont,
 		world:       nil,
 		spriteSheet: nil,
 		client:      client,
@@ -63,7 +65,8 @@ func (system *RemoteGuysSystem) onSessionJoin(client *net.RemoteClient, target *
 	} else {
 		position = engo.Point{X: engo.GameWidth() / 2, Y: (engo.GameHeight() / 2) + 128}
 	}
-	hero := system.CreateHero(system.world, position, system.spriteSheet, *target)
+
+	hero := system.CreateHero(system.world, position, system.spriteSheet, *target, *client.Participants[*target])
 	if anim != nil {
 		targetAnim := ActionsByKey[*anim]
 		if targetAnim != nil {
@@ -91,6 +94,7 @@ func (system *RemoteGuysSystem) onSessionLeave(client *net.RemoteClient, target 
 				switch sys := system.(type) {
 				case *common.RenderSystem:
 					sys.Remove(e.BasicEntity)
+					sys.Remove(e.Label.BasicEntity)
 				case *common.AnimationSystem:
 					sys.Remove(e.BasicEntity)
 				case *RemoteGuysSystem:
@@ -149,6 +153,9 @@ func (system *RemoteGuysSystem) Update(dt float32) {
 					e.SpaceComponent.Position = engo.Point{X: e.Guy.RemotePosition.X, Y: e.Guy.RemotePosition.Y}
 				}
 			}
+			mid := e.SpaceComponent.Position.X + (e.SpaceComponent.Width / 2) - 4
+			target := mid - (e.Label.RenderComponent.Drawable.Width() / 2)
+			e.Label.SpaceComponent.Position = engo.Point{X: target, Y: e.SpaceComponent.Position.Y}
 			e.Guy.RemoteAnimation = nil
 			e.Guy.RemoteVector = nil
 			e.Guy.RemotePosition = nil
@@ -166,8 +173,18 @@ func (system *RemoteGuysSystem) New(world *ecs.World) {
 	system.client.Initialize()
 }
 
-func (system *RemoteGuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *common.Spritesheet, remoteId string) *entities.Guy {
-	hero := &entities.Guy{BasicEntity: ecs.NewBasic(), RemoteId: &remoteId}
+func (guysSystem *RemoteGuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *common.Spritesheet, remoteId string, remoteName string) *entities.Guy {
+	hero := &entities.Guy{BasicEntity: ecs.NewBasic(), RemoteId: &remoteId, Name: &remoteName}
+
+	hostLabel := entities.Label{BasicEntity: ecs.NewBasic()}
+	hostLabel.RenderComponent.Drawable = common.Text{
+		Font: guysSystem.labelFont,
+		Text: *hero.Name,
+	}
+	hostLabel.SpaceComponent.Position = point
+
+	hostLabel.RenderComponent.SetZIndex(6)
+	hero.Label = &hostLabel
 
 	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
@@ -215,7 +232,11 @@ func (system *RemoteGuysSystem) CreateHero(world *ecs.World, point engo.Point, s
 				&hero.RenderComponent,
 				&hero.SpaceComponent,
 			)
-
+			sys.Add(
+				&hero.Label.BasicEntity,
+				&hero.Label.RenderComponent,
+				&hero.Label.SpaceComponent,
+			)
 		case *common.AnimationSystem:
 			sys.Add(
 				&hero.BasicEntity,

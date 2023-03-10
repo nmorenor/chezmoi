@@ -16,6 +16,7 @@ import (
 	"golang.org/x/image/font/gofont/gosmallcaps"
 
 	"github.com/Noofbiz/engoBox2dSystem"
+	colorful "github.com/lucasb-eyer/go-colorful"
 )
 
 type MainScene struct {
@@ -52,6 +53,22 @@ func (scene *MainScene) Preload() {
 func (scene *MainScene) Setup(updater engo.Updater) {
 	common.SetBackground(color.Black)
 
+	localColor, _ := colorful.Hex("#27bdf5cc")
+	remoteColor, _ := colorful.Hex("#43ff64d9")
+
+	localGuyFont := &common.Font{
+		URL:  "fonts/pixelfont.ttf",
+		FG:   localColor,
+		Size: 8,
+	}
+	localGuyFont.CreatePreloaded()
+	remoteGuyFont := &common.Font{
+		URL:  "fonts/pixelfont.ttf",
+		FG:   remoteColor,
+		Size: 8,
+	}
+	remoteGuyFont.CreatePreloaded()
+
 	world, _ := updater.(*ecs.World)
 	world.AddSystem(&common.RenderSystem{})
 	world.AddSystem(&common.AnimationSystem{})
@@ -70,8 +87,8 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 
 	world.AddSystem(&systems.TilesSystem{})
 	world.AddSystem(systems.NewControlSystem(options.SessionInfo.Client))
-	world.AddSystem(&systems.GuysSystem{})
-	remoteSystem := systems.NewRemoteGuysSystem(options.SessionInfo.Client)
+	world.AddSystem(systems.NewGuysSystem(localGuyFont))
+	remoteSystem := systems.NewRemoteGuysSystem(options.SessionInfo.Client, remoteGuyFont)
 	world.AddSystem(remoteSystem)
 
 	engoBox2dSystem.World.SetGravity(box2d.B2Vec2{X: 0, Y: 0})

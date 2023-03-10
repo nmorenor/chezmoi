@@ -2,6 +2,7 @@ package systems
 
 import (
 	"github.com/nmorenor/chezmoi/entities"
+	"github.com/nmorenor/chezmoi/options"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
@@ -12,8 +13,13 @@ import (
 )
 
 type GuysSystem struct {
-	localGuy *entities.Guy
-	world    *ecs.World
+	localGuy  *entities.Guy
+	world     *ecs.World
+	labelFont *common.Font
+}
+
+func NewGuysSystem(labelFont *common.Font) *GuysSystem {
+	return &GuysSystem{labelFont: labelFont}
 }
 
 func (cb *GuysSystem) Remove(ecs.BasicEntity) {
@@ -103,10 +109,19 @@ func (cb *GuysSystem) New(world *ecs.World) {
 		engo.Point{X: engo.GameWidth() / 2, Y: (engo.GameHeight() / 2) + 128},
 		spriteSheet,
 	)
+	cb.localGuy.Label.SpaceComponent.Position = engo.Point{X: cb.localGuy.SpaceComponent.Position.X, Y: cb.localGuy.SpaceComponent.Position.Y}
 }
 
-func (*GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *common.Spritesheet) *entities.Guy {
-	hero := &entities.Guy{BasicEntity: ecs.NewBasic()}
+func (guysSystem *GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *common.Spritesheet) *entities.Guy {
+	hero := &entities.Guy{BasicEntity: ecs.NewBasic(), Name: options.SessionInfo.Username}
+
+	hostLabel := entities.Label{BasicEntity: ecs.NewBasic()}
+	hostLabel.RenderComponent.Drawable = common.Text{
+		Font: guysSystem.labelFont,
+		Text: *hero.Name,
+	}
+	hostLabel.RenderComponent.SetZIndex(6)
+	hero.Label = &hostLabel
 
 	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
@@ -154,7 +169,11 @@ func (*GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *c
 				&hero.RenderComponent,
 				&hero.SpaceComponent,
 			)
-
+			sys.Add(
+				&hero.Label.BasicEntity,
+				&hero.Label.RenderComponent,
+				&hero.Label.SpaceComponent,
+			)
 		case *common.AnimationSystem:
 			sys.Add(
 				&hero.BasicEntity,
