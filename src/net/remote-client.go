@@ -7,15 +7,10 @@ import (
 	"github.com/EngoEngine/engo"
 	"github.com/f1bonacc1/glippy"
 	"github.com/nmorenor/chezmoi-net/client"
-	"github.com/nmorenor/chezmoi-net/utils"
-)
-
-const (
-	broadcast = "-1"
 )
 
 func NewRemoteClient(currentClient *client.Client, userName string, hostMode bool) *RemoteClient {
-	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, outmutex: &sync.Mutex{}, inmutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, locationMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
+	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, outmutex: &sync.Mutex{}, inmutex: &sync.Mutex{}, locationMutex: &sync.Mutex{}, Host: hostMode, Username: userName}
 	remoteClient.Client.OnConnect = remoteClient.onReady
 	remoteClient.Client.OnSessionChange = remoteClient.onSessionChange
 	return remoteClient
@@ -47,11 +42,9 @@ type RemoteClient struct {
 	initialized    bool
 	Client         *client.Client
 	Participants   map[string]*string
-	outUueue       *utils.Queue[string]
 	outmutex       *sync.Mutex
 	inmutex        *sync.Mutex
 	locationMutex  *sync.Mutex
-	queueMutex     *sync.Mutex
 	Username       string
 	Session        *string
 	LocalPosition  *engo.Point
@@ -62,24 +55,10 @@ type RemoteClient struct {
 	OnSessionEnd   func()
 }
 
-func (remoteClient *RemoteClient) target() *string {
-	remoteClient.queueMutex.Lock()
-	defer remoteClient.queueMutex.Unlock()
-
-	if remoteClient.outUueue.IsEmpty() {
-		return nil
-	}
-	target := remoteClient.outUueue.Remove()
-	if *target == broadcast {
-		return nil
-	}
-	return target
-}
-
 // This will be called when web socket is connected
 func (remoteClient *RemoteClient) onReady() {
 	// Register this (RemoteClient) instance to receive rcp calls
-	client.RegisterService(remoteClient, remoteClient.Client, remoteClient.target)
+	client.RegisterService(remoteClient, remoteClient.Client)
 
 	if remoteClient.Host {
 		remoteClient.Client.StartHosting(remoteClient.Username)
@@ -104,14 +83,11 @@ func (remoteClient *RemoteClient) Initialize() {
 				remoteClient.outmutex.Lock()
 				defer remoteClient.outmutex.Unlock()
 				rpcClient := remoteClient.Client.GetRpcClientForService(*remoteClient)
-				sname := remoteClient.Client.GetServiceName(*remoteClient)
+				sname := remoteClient.Client.GetServiceName(*remoteClient, "GetPosition", &id)
 				var position PositionResponseMessage
 				if rpcClient != nil {
-					remoteClient.queueMutex.Lock()
-					remoteClient.outUueue.Add(&id)
-					remoteClient.queueMutex.Unlock()
 					msg := PositionMessage{Id: id}
-					rpcClient.Call(sname+".GetPosition", msg, &position)
+					rpcClient.Call(sname, msg, &position)
 				}
 				remoteClient.OnSessionJoin(remoteClient, &id, &position.Position, &position.Anim)
 				break
@@ -134,35 +110,19 @@ func (remoteClient *RemoteClient) SendMessage(vector Point, position Point, anim
 	remoteClient.outmutex.Lock()
 	defer remoteClient.outmutex.Unlock()
 	rpcClient := remoteClient.Client.GetRpcClientForService(*remoteClient)
-	sname := remoteClient.Client.GetServiceName(*remoteClient)
+
 	msg := &Message{
 		Source:    *remoteClient.Client.Id,
 		Point:     vector,
 		Position:  position,
 		Animation: animation,
 	}
-	// if message starts with [memberName] try to lookup as target
-	if target != nil {
-		candidate := remoteClient.findParticipantFromName(*target)
-		if candidate != nil {
-			remoteClient.queueMutex.Lock()
-			remoteClient.outUueue.Add(candidate)
-			remoteClient.queueMutex.Unlock()
-		} else {
-			remoteClient.queueMutex.Lock()
-			remoteClient.outUueue.Add(ptr(broadcast))
-			remoteClient.queueMutex.Unlock()
-		}
-	}
 
+	sname := remoteClient.Client.GetServiceName(*remoteClient, "OnMessage", remoteClient.findParticipantFromName(*target))
 	if rpcClient != nil {
 		var reply string
-		rpcClient.Call(sname+".OnMessage", msg, &reply)
+		rpcClient.Call(sname, msg, &reply)
 	}
-}
-
-func ptr[T any](t T) *T {
-	return &t
 }
 
 func (remoteClient *RemoteClient) findParticipantFromName(target string) *string {
