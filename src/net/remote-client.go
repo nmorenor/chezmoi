@@ -15,7 +15,7 @@ const (
 )
 
 func NewRemoteClient(currentClient *client.Client, userName string, hostMode bool) *RemoteClient {
-	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, mutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
+	remoteClient := &RemoteClient{Client: currentClient, Participants: nil, mutex: &sync.Mutex{}, queueMutex: &sync.Mutex{}, locationMutex: &sync.Mutex{}, Host: hostMode, outUueue: utils.NewQueue[string](), Username: userName}
 	remoteClient.Client.OnConnect = remoteClient.onReady
 	remoteClient.Client.OnSessionChange = remoteClient.onSessionChange
 	return remoteClient
@@ -49,6 +49,7 @@ type RemoteClient struct {
 	Participants   map[string]*string
 	outUueue       *utils.Queue[string]
 	mutex          *sync.Mutex
+	locationMutex  *sync.Mutex
 	queueMutex     *sync.Mutex
 	Username       string
 	Session        *string
@@ -120,8 +121,8 @@ func (remoteClient *RemoteClient) Initialize() {
 }
 
 func (remoteClient *RemoteClient) SetLocalPosition(position *engo.Point, anim *string) {
-	remoteClient.mutex.Lock()
-	defer remoteClient.mutex.Unlock()
+	remoteClient.locationMutex.Lock()
+	defer remoteClient.locationMutex.Unlock()
 	remoteClient.LocalPosition = position
 	if anim != nil {
 		remoteClient.LocalAnimation = anim
@@ -180,6 +181,7 @@ func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) err
 	defer remoteClient.mutex.Unlock()
 	if remoteClient.Participants[message.Source] != nil {
 		if remoteClient.OnRemoteUpdate != nil {
+			fmt.Println("hola")
 			remoteClient.OnRemoteUpdate(remoteClient, &message.Source, *message)
 		}
 	}
@@ -188,8 +190,8 @@ func (remoteClient *RemoteClient) OnMessage(message *Message, reply *string) err
 }
 
 func (remoteClient *RemoteClient) GetPosition(message *PositionMessage, reply *PositionResponseMessage) error {
-	remoteClient.mutex.Lock()
-	defer remoteClient.mutex.Unlock()
+	remoteClient.locationMutex.Lock()
+	defer remoteClient.locationMutex.Unlock()
 	if remoteClient.LocalPosition != nil && remoteClient.LocalAnimation != nil {
 		*reply = PositionResponseMessage{Position: Point{X: remoteClient.LocalPosition.X, Y: remoteClient.LocalPosition.Y}, Anim: *remoteClient.LocalAnimation}
 	}
