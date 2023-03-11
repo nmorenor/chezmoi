@@ -9,3 +9,10 @@ bin/staticcheck
 src/assets/fonts
 src/assets/textures
 src/assets/levels
+src/assets/bindata.go
+src/assets/share.svg
+src/assets/close-circle.svg
+src/assets/rectangle.svg
+src/chezmoi
+src/chezmoi.exe
+src/.DS_Store

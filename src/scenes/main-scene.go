@@ -33,6 +33,9 @@ func (scene *MainScene) Preload() {
 		"levels/interiors.tmx",
 		"textures/run_horizontal_32x32_2.png",
 		"textures/button.png",
+		"rectangle.svg",
+		"share.svg",
+		"close-circle.svg",
 	}
 	for _, file := range files {
 		data, err := assets.Asset(file)
@@ -90,6 +93,7 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 	world.AddSystem(systems.NewGuysSystem(localGuyFont))
 	remoteSystem := systems.NewRemoteGuysSystem(options.SessionInfo.Client, remoteGuyFont)
 	world.AddSystem(remoteSystem)
+	world.AddSystem(systems.NewHudSystem(localGuyFont, options.SessionInfo.Client))
 
 	engoBox2dSystem.World.SetGravity(box2d.B2Vec2{X: 0, Y: 0})
 

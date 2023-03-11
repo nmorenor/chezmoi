@@ -12,6 +12,7 @@ require (
 	github.com/nmorenor/chezmoi-net v0.0.0-20230310181233-7d22ad02bbbf
 	github.com/sacOO7/gowebsocket v0.0.0-20221109081133-70ac927be105
 	golang.org/x/image v0.5.0
+	github.com/lucasb-eyer/go-colorful v1.2.0
 )
 
 require (
@@ -29,7 +30,6 @@ require (
 	github.com/jezek/xgb v1.1.0 // indirect
 	github.com/jfreymuth/oggvorbis v1.0.3 // indirect
 	github.com/jfreymuth/vorbis v1.0.2 // indirect
-	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/maniartech/signals v1.1.0 // indirect
 	github.com/mborders/artifex v0.4.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
