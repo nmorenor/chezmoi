@@ -128,4 +128,7 @@ func (t *TypingSystem) Update(dt float32) {
 
 	}
 	t.label.Drawable = txt
+	mid := (engo.WindowWidth() / 2)
+	target := mid - (t.label.RenderComponent.Drawable.Width() / 2)
+	t.label.SpaceComponent.Position = engo.Point{X: target, Y: t.label.SpaceComponent.Position.Y}
 }

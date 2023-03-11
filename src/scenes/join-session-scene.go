@@ -39,7 +39,7 @@ func (scene *SetJoinSessionNameScene) Preload() {
 	}
 	engo.Files.LoadReaderData("go.ttf", bytes.NewReader(gosmallcaps.TTF))
 	engo.Input.RegisterButton("backspace", engo.KeyBackspace)
-	engo.Input.RegisterButton("paste", engo.KeyF1)
+	engo.Input.RegisterButton("paste", engo.Key(engo.Control), engo.KeyV)
 	engo.Input.RegisterButton("enter", engo.KeyEnter)
 }
 
@@ -65,7 +65,9 @@ func (scene *SetJoinSessionNameScene) Setup(updater engo.Updater) {
 		Text: "Session:",
 	}
 	t.RenderComponent.SetZIndex(1)
-	t.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 70, Y: (engo.WindowHeight() / 2) - 50}
+	mid := (engo.WindowWidth() / 2)
+	target := mid - (t.RenderComponent.Drawable.Width() / 2)
+	t.SpaceComponent.Position = engo.Point{X: target, Y: (engo.WindowHeight() / 2) - 50}
 	w.AddEntity(&t)
 
 	w.AddSystem(&systems.TypingSystem{Session: true})
