@@ -40,12 +40,12 @@ func NewHudSystem(labelFont *common.Font, client *net.RemoteClient) *HudSystem {
 
 func (cb *HudSystem) New(world *ecs.World) {
 	cb.world = world
-	rectangle, _ := common.LoadedSprite("rectangle.svg")
+	rectangle, _ := common.LoadedSprite("rectangle-small.svg")
 	rectangleBase := entities.Button{BasicEntity: ecs.NewBasic()}
 
 	rectangleBase.RenderComponent.Drawable = rectangle
 	rectangleBase.RenderComponent.SetZIndex(1001)
-	rectangleBase.SpaceComponent = common.SpaceComponent{Position: engo.Point{X: -10, Y: (engo.WindowHeight()) - 150}, Width: rectangle.Width(), Height: rectangleBase.Height}
+	rectangleBase.SpaceComponent = common.SpaceComponent{Position: engo.Point{X: 0, Y: (engo.WindowHeight()) - rectangle.Height()}, Width: rectangle.Width(), Height: rectangleBase.Height}
 	rectangleBase.SetShader(common.HUDShader)
 
 	closeCircle, _ := common.LoadedSprite("close-circle.svg")
@@ -53,7 +53,7 @@ func (cb *HudSystem) New(world *ecs.World) {
 	closeSessionButton.RenderComponent.SetZIndex(1002)
 	closeSessionButton.RenderComponent.Drawable = closeCircle
 	closeSessionButton.SpaceComponent.Position.X = 25
-	closeSessionButton.SpaceComponent.Position.Y = (rectangleBase.SpaceComponent.Position.Y + rectangleBase.SpaceComponent.Height) + 100
+	closeSessionButton.SpaceComponent.Position.Y = (rectangleBase.SpaceComponent.Position.Y + 12)
 	closeSessionButton.SpaceComponent.Height = closeCircle.Height()
 	closeSessionButton.SpaceComponent.Width = closeCircle.Width()
 	closeSessionButton.SetShader(common.HUDShader)

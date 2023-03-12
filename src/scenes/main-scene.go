@@ -33,6 +33,7 @@ func (scene *MainScene) Preload() {
 		"levels/interiors.tmx",
 		"textures/run_horizontal_32x32_2.png",
 		"textures/button.png",
+		"rectangle-small.svg",
 		"rectangle.svg",
 		"share.svg",
 		"close-circle.svg",

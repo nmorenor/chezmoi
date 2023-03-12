@@ -22,6 +22,8 @@ type TypingSystem struct {
 	runeLock          sync.Mutex
 	runesToAdd        []rune
 	timeSinceDeletion float32
+	remoteClient      *net.RemoteClient
+	connecting        bool
 }
 
 func (t *TypingSystem) New(w *ecs.World) {
@@ -67,20 +69,24 @@ func (t *TypingSystem) New(w *ecs.World) {
 func (*TypingSystem) Remove(ecs.BasicEntity) {}
 
 func (t *TypingSystem) StartSession() {
-	remoteClient := net.NewRemoteClient(client.NewClient(gowebsocket.New("wss://nmorenor.com/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
+	t.remoteClient = net.NewRemoteClient(client.NewClient(gowebsocket.New("ws://localhost:8080/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
 	if t.Session {
-		remoteClient.Session = options.SessionInfo.Session
-		remoteClient.Client.Session = options.SessionInfo.Session
+		t.connecting = true
+		t.remoteClient.Session = options.SessionInfo.Session
+		t.remoteClient.Client.Session = options.SessionInfo.Session
 	}
-	options.SessionInfo.Client = remoteClient
+	options.SessionInfo.Client = t.remoteClient
 	go func(c *client.Client) {
 		c.Connect()
-	}(remoteClient.Client)
+	}(t.remoteClient.Client)
 }
 
 func (t *TypingSystem) Update(dt float32) {
-	if options.SessionInfo.Client != nil && options.SessionInfo.Client.Client.Id != nil && options.SessionInfo.Client.Participants != nil {
+	if t.remoteClient != nil && t.remoteClient.Client.Id != nil && t.remoteClient.Participants != nil {
 		engo.SetSceneByName("Session", true)
+		return
+	}
+	if t.connecting {
 		return
 	}
 	t.timeSinceDeletion += dt
@@ -114,7 +120,6 @@ func (t *TypingSystem) Update(dt float32) {
 			username := txt.Text
 			options.SessionInfo.Username = &username
 			t.StartSession()
-			engo.SetSceneByName("Session", true)
 		} else {
 			candidate := txt.Text
 			if t.Session {
