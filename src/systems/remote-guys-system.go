@@ -15,6 +15,19 @@ import (
 	"github.com/Noofbiz/engoBox2dSystem"
 )
 
+const (
+	SessionEndType = "SessionEndType"
+)
+
+type SessionEndMessage struct {
+	Session string
+}
+
+// Type implements the engo.Message interface
+func (SessionEndMessage) Type() string {
+	return SessionEndType
+}
+
 type RemoteGuysSystem struct {
 	entities    []*entities.ControlEntity
 	labelFont   *common.Font
@@ -41,6 +54,9 @@ func NewRemoteGuysSystem(client *net.RemoteClient, labelFont *common.Font) *Remo
 }
 
 func (system *RemoteGuysSystem) onSessionEnd() {
+	engo.Mailbox.Dispatch(SessionEndMessage{
+		Session: *options.SessionInfo.Session,
+	})
 	options.Reset()
 }
 

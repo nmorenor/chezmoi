@@ -23,7 +23,7 @@ func NewGuysSystem(labelFont *common.Font) *GuysSystem {
 }
 
 func (cb *GuysSystem) Remove(ecs.BasicEntity) {
-	// do nothing
+	cb.localGuy = nil
 }
 
 // Update is ran every frame, with `dt` being the time
@@ -110,6 +110,13 @@ func (cb *GuysSystem) New(world *ecs.World) {
 		spriteSheet,
 	)
 	cb.localGuy.Label.SpaceComponent.Position = engo.Point{X: cb.localGuy.SpaceComponent.Position.X, Y: cb.localGuy.SpaceComponent.Position.Y}
+	engo.Mailbox.Listen(SessionEndType, func(m engo.Message) {
+		_, ok := m.(SessionEndMessage)
+		if !ok {
+			return
+		}
+		cb.onSessionEnd()
+	})
 }
 
 func (guysSystem *GuysSystem) CreateHero(world *ecs.World, point engo.Point, spriteSheet *common.Spritesheet) *entities.Guy {
@@ -209,4 +216,24 @@ func (guysSystem *GuysSystem) CreateHero(world *ecs.World, point engo.Point, spr
 	})
 
 	return hero
+}
+
+func (guySystem *GuysSystem) onSessionEnd() {
+	for _, system := range guySystem.world.Systems() {
+		switch sys := system.(type) {
+		case *common.RenderSystem:
+			sys.Remove(guySystem.localGuy.BasicEntity)
+			sys.Remove(guySystem.localGuy.Label.BasicEntity)
+		case *common.AnimationSystem:
+			sys.Remove(guySystem.localGuy.BasicEntity)
+		case *RemoteGuysSystem:
+			sys.Remove(guySystem.localGuy.BasicEntity)
+		case *engoBox2dSystem.PhysicsSystem:
+			sys.Remove(guySystem.localGuy.BasicEntity)
+		case *engoBox2dSystem.CollisionSystem:
+			sys.Remove(guySystem.localGuy.BasicEntity)
+		}
+	}
+	guySystem.Remove(guySystem.localGuy.BasicEntity)
+
 }

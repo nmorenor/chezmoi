@@ -83,6 +83,11 @@ func (cb *HudSystem) New(world *ecs.World) {
 		}
 		if msg.EventType == CLOSE {
 			cb.close = true
+			if cb.client.Client.Host {
+				engo.Mailbox.Dispatch(SessionEndMessage{
+					Session: *cb.client.Client.Session,
+				})
+			}
 			cb.client.Client.Close()
 			options.Reset()
 		}
