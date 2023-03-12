@@ -69,7 +69,7 @@ func (t *TypingSystem) New(w *ecs.World) {
 func (*TypingSystem) Remove(ecs.BasicEntity) {}
 
 func (t *TypingSystem) StartSession() {
-	t.remoteClient = net.NewRemoteClient(client.NewClient(gowebsocket.New("ws://localhost:8080/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
+	t.remoteClient = net.NewRemoteClient(client.NewClient(gowebsocket.New("wss://nmorenor.com/ws")), *options.SessionInfo.Username, options.SessionInfo.HostMode)
 	if t.Session {
 		t.connecting = true
 		t.remoteClient.Session = options.SessionInfo.Session
