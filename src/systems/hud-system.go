@@ -49,7 +49,7 @@ func (cb *HudSystem) New(world *ecs.World) {
 	rectangleBase.SetShader(common.HUDShader)
 
 	closeCircle, _ := common.LoadedSprite("close-circle.svg")
-	closeSessionButton := entities.Button{BasicEntity: ecs.NewBasic()}
+	closeSessionButton := entities.Button{BasicEntity: ecs.NewBasic(), MouseComponent: common.MouseComponent{Track: true}}
 	closeSessionButton.RenderComponent.SetZIndex(1002)
 	closeSessionButton.RenderComponent.Drawable = closeCircle
 	closeSessionButton.SpaceComponent.Position.X = 25
@@ -59,7 +59,7 @@ func (cb *HudSystem) New(world *ecs.World) {
 	closeSessionButton.SetShader(common.HUDShader)
 
 	shareSprite, _ := common.LoadedSprite("share.svg")
-	shareButton := entities.Button{BasicEntity: ecs.NewBasic()}
+	shareButton := entities.Button{BasicEntity: ecs.NewBasic(), MouseComponent: common.MouseComponent{Track: true}}
 	shareButton.RenderComponent.SetZIndex(1002)
 	shareButton.RenderComponent.Drawable = shareSprite
 	shareButton.SpaceComponent.Position.X = closeSessionButton.SpaceComponent.Position.X + closeSessionButton.SpaceComponent.Width + 2
@@ -75,6 +75,11 @@ func (cb *HudSystem) New(world *ecs.World) {
 	shareSystem := &HudEventSystem{EventType: SHARE}
 	world.AddSystem(shareSystem)
 	shareSystem.Add(&shareButton.BasicEntity, &shareButton.SpaceComponent)
+
+	cursorSystem := NewCursorSystem()
+	world.AddSystem(cursorSystem)
+	cursorSystem.Add(&closeSessionButton.BasicEntity, &closeSessionButton.SpaceComponent, &closeSessionButton.RenderComponent, &closeSessionButton.MouseComponent)
+	cursorSystem.Add(&shareButton.BasicEntity, &shareButton.SpaceComponent, &shareButton.RenderComponent, &shareButton.MouseComponent)
 
 	engo.Mailbox.Listen(HUDEventType, func(m engo.Message) {
 		msg, ok := m.(HUDEventMessage)
@@ -115,6 +120,9 @@ func (cb *HudSystem) New(world *ecs.World) {
 				&shareButton.RenderComponent,
 				&shareButton.SpaceComponent,
 			)
+		case *common.MouseSystem:
+			sys.Add(&closeSessionButton.BasicEntity,
+				&closeSessionButton.MouseComponent, nil, nil)
 		}
 	}
 }

@@ -28,4 +28,12 @@ type Button struct {
 	common.SpaceComponent
 	common.RenderComponent
 	common.AudioComponent
+	common.MouseComponent
+}
+
+type UIElement struct {
+	*ecs.BasicEntity
+	*common.SpaceComponent
+	*common.RenderComponent
+	*common.MouseComponent
 }

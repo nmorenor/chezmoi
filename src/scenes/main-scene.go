@@ -95,6 +95,7 @@ func (scene *MainScene) Setup(updater engo.Updater) {
 	remoteSystem := systems.NewRemoteGuysSystem(options.SessionInfo.Client, remoteGuyFont)
 	world.AddSystem(remoteSystem)
 	world.AddSystem(systems.NewHudSystem(localGuyFont, options.SessionInfo.Client))
+	world.AddSystem(&common.MouseSystem{})
 
 	engoBox2dSystem.World.SetGravity(box2d.B2Vec2{X: 0, Y: 0})
 

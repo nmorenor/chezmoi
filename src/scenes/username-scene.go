@@ -47,6 +47,7 @@ func (scene *SetUserNameScene) Preload() {
 // to add entities and systems to your Scene.
 func (scene *SetUserNameScene) Setup(updater engo.Updater) {
 	common.SetBackground(color.Black)
+	engo.SetCursor(engo.CursorArrow)
 
 	w, _ := updater.(*ecs.World)
 	var renderable *common.Renderable
@@ -69,4 +70,6 @@ func (scene *SetUserNameScene) Setup(updater engo.Updater) {
 	w.AddEntity(&t)
 
 	w.AddSystem(&systems.TypingSystem{})
+	cursorSystem := systems.NewCursorSystem()
+	w.AddSystem(cursorSystem)
 }

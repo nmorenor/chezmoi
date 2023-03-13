@@ -235,5 +235,5 @@ func (guySystem *GuysSystem) onSessionEnd() {
 		}
 	}
 	guySystem.Remove(guySystem.localGuy.BasicEntity)
-
+	engo.SetCursor(engo.CursorArrow)
 }

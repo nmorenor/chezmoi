@@ -70,7 +70,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 	w.AddSystem(hostSessionSystem)
 
 	sgs, _ := common.LoadedSprite("textures/button.png")
-	hostButton := entities.Button{BasicEntity: ecs.NewBasic()}
+	hostButton := entities.Button{BasicEntity: ecs.NewBasic(), MouseComponent: common.MouseComponent{Track: true}}
 	hostButton.RenderComponent.Drawable = sgs
 	hostButton.RenderComponent.SetZIndex(2)
 	hostButton.SpaceComponent.Position = engo.Point{X: (engo.WindowWidth() / 2) - 50, Y: (engo.WindowHeight() / 2) + 50}
@@ -97,7 +97,7 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 	joinSessionSystem := &systems.SetupSessionSystem{NextScene: "JoinUsername", HostMode: false}
 	w.AddSystem(joinSessionSystem)
 
-	joinButton := entities.Button{BasicEntity: ecs.NewBasic()}
+	joinButton := entities.Button{BasicEntity: ecs.NewBasic(), MouseComponent: common.MouseComponent{Track: true}}
 	joinButton.RenderComponent.Drawable = sgs
 	joinButton.RenderComponent.SetZIndex(2)
 	joinButton.SpaceComponent.Position = engo.Point{X: (hostButton.SpaceComponent.Position.X + hostButton.SpaceComponent.Width + 25), Y: hostButton.SpaceComponent.Position.Y}
@@ -112,6 +112,11 @@ func (scene *StartOptionsScene) Setup(updater engo.Updater) {
 	joinLabel.RenderComponent.SetZIndex(3)
 	joinLabel.SpaceComponent.Position = engo.Point{X: (joinButton.SpaceComponent.Position.X + 7), Y: joinButton.SpaceComponent.Position.Y + 2}
 	w.AddEntity(&joinLabel)
+
+	cursorSystem := systems.NewCursorSystem()
+	w.AddSystem(cursorSystem)
+	cursorSystem.Add(&hostButton.BasicEntity, &hostButton.SpaceComponent, &hostButton.RenderComponent, &hostButton.MouseComponent)
+	cursorSystem.Add(&joinButton.BasicEntity, &joinButton.SpaceComponent, &joinButton.RenderComponent, &joinButton.MouseComponent)
 
 	joinSessionSystem.Add(&joinButton.BasicEntity, &joinButton.SpaceComponent)
 
